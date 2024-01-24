@@ -1,0 +1,39 @@
+lockfileVersion: '6.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+dependencies:
+  zrender:
+    specifier: ^5.4.4
+    version: registry.npmmirror.com/zrender@5.4.4
+
+devDependencies:
+  typescript:
+    specifier: ^5.3.3
+    version: registry.npmmirror.com/typescript@5.3.3
+
+packages:
+
+  registry.npmmirror.com/tslib@2.3.0:
+    resolution: {integrity: sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/tslib/-/tslib-2.3.0.tgz}
+    name: tslib
+    version: 2.3.0
+    dev: false
+
+  registry.npmmirror.com/typescript@5.3.3:
+    resolution: {integrity: sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/typescript/-/typescript-5.3.3.tgz}
+    name: typescript
+    version: 5.3.3
+    engines: {node: '>=14.17'}
+    hasBin: true
+    dev: true
+
+  registry.npmmirror.com/zrender@5.4.4:
+    resolution: {integrity: sha512-0VxCNJ7AGOMCWeHVyTrGzUgrK4asT4ml9PEkeGirAkKNYXYzoPJCLvmyfdoOXcjTHPs10OZVMfD1Rwg16AZyYw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/zrender/-/zrender-5.4.4.tgz}
+    name: zrender
+    version: 5.4.4
+    dependencies:
+      tslib: registry.npmmirror.com/tslib@2.3.0
+    dev: false
