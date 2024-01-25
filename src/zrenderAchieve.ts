@@ -250,7 +250,7 @@ export class ZrenderAchieve {
 					fontWeight: fontWidth,
 					text: content,
 					fill: color,
-					fontSize: fontSize / 3.2
+					fontSize: fontSize / this.widthRatio()
 				}
 			});
 			templateTextGroup.add(moduleText);
