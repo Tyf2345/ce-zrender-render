@@ -1,9 +1,9 @@
-import { Group } from "zrender";
-import { IModuleProps } from "./zrenderConfig";
-export declare function pipeFn(...fns: any[]): (...args: any[]) => void;
+import { Group } from 'zrender';
+import { IModuleProps } from './zrenderConfig';
+export declare function pipeFn(...fns: Function[]): (...args: Function[]) => void;
 export declare function download(blob: Blob, name: string): void;
 interface IImageRes {
-    name: "image";
+    name: 'image';
     style: {
         image: string;
         width: number;
@@ -11,7 +11,7 @@ interface IImageRes {
     };
 }
 interface ITextRes {
-    name: "text";
+    name: 'text';
     style: {
         text: string;
         fill?: string;
@@ -24,8 +24,8 @@ export type TGroupDataRes = (IImageRes | ITextRes)[];
 export declare function getGroupData(group: Group): IModuleProps;
 export declare class PubSub {
     private subs;
-    subscribe(type: "group", cb: (group: Group, params: IModuleProps) => void): void;
-    publish(type: "group", msg: Group, params: IModuleProps): void;
+    subscribe(type: 'group', cb: (group: Group, params: IModuleProps) => void): void;
+    publish(type: 'group', msg: Group, params: IModuleProps): void;
 }
 export declare function stringToObject(strList: string[], v: string | number): string;
 export {};

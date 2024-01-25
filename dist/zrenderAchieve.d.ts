@@ -1,6 +1,6 @@
-import * as zrender from "zrender";
-import { IFixedConfig, IRelativeConfig, IZrenderAchieveOptions } from "./zrenderOptions";
-import { PubSub } from "./utils";
+import * as zrender from 'zrender';
+import { IFixedConfig, IRelativeConfig, IZrenderAchieveOptions } from './zrenderOptions';
+import { PubSub } from './utils';
 /**
  * zrender实现
  */
@@ -23,7 +23,7 @@ export declare class ZrenderAchieve {
     fileHeight: number;
     fileWidth: number;
     pubSub: PubSub;
-    constructor(domountNode: HTMLDivElement, currentRenderCanvasConfig: IRelativeConfig | IFixedConfig, { globalGuideLineStatus, globalStandardLineStatus, globalBorderLimitStatus, globalMousewheelStatus, globalTextStatus, globalZStatus, renderPosition, canvasHeight, canvasWidth, fileHeight, fileWidth, }: IZrenderAchieveOptions);
+    constructor(domountNode: HTMLDivElement, currentRenderCanvasConfig: IRelativeConfig | IFixedConfig, { globalGuideLineStatus, globalStandardLineStatus, globalBorderLimitStatus, globalMousewheelStatus, globalTextStatus, globalZStatus, renderPosition, canvasHeight, canvasWidth, fileHeight, fileWidth }: IZrenderAchieveOptions);
     /**
      * 渲染
      */

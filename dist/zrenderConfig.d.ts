@@ -1,5 +1,5 @@
-import { LineProps } from "zrender";
-import { FontWeight } from "zrender/lib/core/types";
+import { LineProps } from 'zrender';
+import { FontWeight } from 'zrender/lib/core/types';
 interface ICanvasConfigProps {
     guideLineConfig: LineProps;
     standardLineConfig: LineProps;

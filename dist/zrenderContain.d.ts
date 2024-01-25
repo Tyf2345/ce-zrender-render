@@ -1,5 +1,5 @@
-import { ZrenderAchieve } from "./zrenderAchieve";
-export type TSaveType = "image/jpg" | "image/jpeg" | "image/png" | "application/pdf" | "psd";
+import { ZrenderAchieve } from './zrenderAchieve';
+export type TSaveType = 'image/jpg' | 'image/jpeg' | 'image/png' | 'application/pdf' | 'psd';
 /**
  * zrender渲染容器，包含撤销、前进、重做、保存
  */

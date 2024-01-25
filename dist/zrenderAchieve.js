@@ -1,6 +1,6 @@
-import * as zrender from "zrender";
-import { backgroundGroupName, backgroundImageName, getZrenderConfig, guideLineGroupName, moduleGroupName, standardLineGroupName, } from "./zrenderConfig";
-import { PubSub, getGroupData, pipeFn, stringToObject } from "./utils";
+import * as zrender from 'zrender';
+import { backgroundGroupName, backgroundImageName, getZrenderConfig, guideLineGroupName, moduleGroupName, standardLineGroupName } from './zrenderConfig';
+import { PubSub, getGroupData, pipeFn, stringToObject } from './utils';
 var EGuideLineName;
 (function (EGuideLineName) {
     EGuideLineName["LINE_TOP"] = "lineTop";
@@ -9,7 +9,7 @@ var EGuideLineName;
     EGuideLineName["LINE_LEFT"] = "lineLeft";
 })(EGuideLineName || (EGuideLineName = {}));
 const defaultOptions = {
-    wheelDelta: 0.05,
+    wheelDelta: 0.05
 };
 /**
  * zrender实现
@@ -33,7 +33,7 @@ export class ZrenderAchieve {
     fileHeight;
     fileWidth;
     pubSub;
-    constructor(domountNode, currentRenderCanvasConfig, { globalGuideLineStatus = true, globalStandardLineStatus = false, globalBorderLimitStatus = false, globalMousewheelStatus = true, globalTextStatus = false, globalZStatus = false, renderPosition = "relative", canvasHeight, canvasWidth, fileHeight, fileWidth, }) {
+    constructor(domountNode, currentRenderCanvasConfig, { globalGuideLineStatus = true, globalStandardLineStatus = false, globalBorderLimitStatus = false, globalMousewheelStatus = true, globalTextStatus = false, globalZStatus = false, renderPosition = 'relative', canvasHeight, canvasWidth, fileHeight, fileWidth }) {
         this.domountNode = domountNode;
         this.currentRenderCanvasConfig = currentRenderCanvasConfig;
         this.pubSub = new PubSub();
@@ -60,7 +60,7 @@ export class ZrenderAchieve {
      */
     renderCanvas() {
         this.appendToZr(this.createBackgroundGroup())
-            .appendToZr(this.renderPosition === "relative"
+            .appendToZr(this.renderPosition === 'relative'
             ? this.createModuleGroup()
             : this.createFixedPositoinModule())
             .appendToZr(this.createGuideLineGroup())
@@ -73,14 +73,14 @@ export class ZrenderAchieve {
     }
     initZr(config) {
         if (this.domountNode === null) {
-            throw new Error("zrender挂载节点不存在");
+            throw new Error('zrender挂载节点不存在');
         }
         this.zr = zrender.init(this.domountNode, {
             ...config,
             width: this.canvasWidth,
-            height: this.canvasHeight,
+            height: this.canvasHeight
         });
-        this.zr.on("click", () => this.cleanSideEffects());
+        this.zr.on('click', () => this.cleanSideEffects());
         return this.zr;
     }
     /**
@@ -102,28 +102,28 @@ export class ZrenderAchieve {
     }
     listenGroupEvent(group) {
         group
-            .on("click", () => {
-            this.pubSub.publish("group", group, getGroupData(group));
+            .on('click', () => {
+            this.pubSub.publish('group', group, getGroupData(group));
             this.setGuideLinePosition(group);
         })
-            .on("drag", () => pipeFn(() => this.canvasBorderLimit(group), () => this.setGuideLinePosition(group))())
-            .on("mousedown", () => {
-            this.pubSub.publish("group", group, getGroupData(group));
+            .on('drag', () => pipeFn(() => this.canvasBorderLimit(group), () => this.setGuideLinePosition(group))())
+            .on('mousedown', () => {
+            this.pubSub.publish('group', group, getGroupData(group));
             if (this.getZStatus()) {
                 this.z++;
                 group.eachChild(function (e) {
-                    e.attr("z", ZrenderAchieve._that.z);
+                    e.attr('z', ZrenderAchieve._that.z);
                 });
             }
         })
-            .on("mousewheel", ({ wheelDelta }) => {
+            .on('mousewheel', ({ wheelDelta }) => {
             const _wheelData = wheelDelta > 0
                 ? defaultOptions.wheelDelta
                 : -defaultOptions.wheelDelta;
             pipeFn(() => this.getMousewheelStatus(), () => this.canvasBorderLimit(group, _wheelData), () => {
-                group.attr("scaleX", +(group.scaleX += _wheelData).toFixed(2));
-                group.attr("scaleY", +(group.scaleY += _wheelData).toFixed(2));
-            }, () => this.setGuideLinePosition(group), () => this.pubSub.publish("group", group, getGroupData(group)))();
+                group.attr('scaleX', +(group.scaleX += _wheelData).toFixed(2));
+                group.attr('scaleY', +(group.scaleY += _wheelData).toFixed(2));
+            }, () => this.setGuideLinePosition(group), () => this.pubSub.publish('group', group, getGroupData(group)))();
         });
     }
     /**
@@ -140,16 +140,16 @@ export class ZrenderAchieve {
             name: backgroundImageName,
             style: {
                 width: zrW,
-                height: zrH,
+                height: zrH
                 // image: config.src,
-            },
+            }
         }));
         return backgroundGroup;
     }
     updateBackgroundGroup(styleProps) {
         const backgroundGroup = this.getFindRootGroup(backgroundGroupName);
         const backgroundImage = backgroundGroup.childOfName(backgroundImageName);
-        backgroundImage.attr("style", styleProps);
+        backgroundImage.attr('style', styleProps);
     }
     /**
      * 创建固定位置模块
@@ -160,18 +160,18 @@ export class ZrenderAchieve {
         currentConfig.templateImgList.forEach((templateImg, idx) => {
             const { src, width, height, x, y, name } = templateImg;
             const templateImageGroup = this.createGroup({
-                name: `group_image_${idx}`,
+                name: `group_image_${idx}`
             });
             const moduleImage = this.createImageShape({
-                name: name || "image_" + idx,
+                name: name || 'image_' + idx,
                 draggable: true,
                 style: {
                     image: src,
                     width: width / this.widthRatio(),
                     height: height / this.heightRatio(),
                     x: x / this.widthRatio(),
-                    y: y / this.heightRatio(),
-                },
+                    y: y / this.heightRatio()
+                }
             });
             templateImageGroup.add(moduleImage);
             templateGroup.add(templateImageGroup);
@@ -190,8 +190,8 @@ export class ZrenderAchieve {
                     fontWeight: fontWidth,
                     text: content,
                     fill: color,
-                    fontSize: fontSize / 3.2,
-                },
+                    fontSize: fontSize / 3.2
+                }
             });
             templateTextGroup.add(moduleText);
             templateGroup.add(templateTextGroup);
@@ -208,22 +208,22 @@ export class ZrenderAchieve {
     createModuleGroup() {
         const templateGroup = this.createGroup({ name: moduleGroupName });
         const currentConfig = this.currentRenderCanvasConfig;
-        currentConfig.templateImgList.forEach((w, idx) => {
+        currentConfig.templateImgList.forEach((w) => {
             const moduleGroup = this.createGroup({
                 draggable: true,
                 x: w.x / this.widthRatio(),
-                y: w.y / this.heightRatio(),
+                y: w.y / this.heightRatio()
             });
             // 加载图片
             if (w.src) {
                 const moduleImage = this.createImageShape({
-                    name: "image",
+                    name: 'image',
                     // draggable: true,
                     style: {
                         width: w.width / this.widthRatio(),
                         height: w.height / this.heightRatio(),
-                        image: w.src,
-                    },
+                        image: w.src
+                    }
                 });
                 moduleGroup.add(moduleImage);
             }
@@ -235,15 +235,15 @@ export class ZrenderAchieve {
                     name: `text_${idx}`,
                     draggable: true,
                     style: {
-                        ...textElement,
+                        ...textElement
                         // backgroundColor: "transparent",
                         // fontWeight: "bold",
                         // text: element.text,
                         // fill: "red",
                         // fontSize: 12,
-                    },
+                    }
                 });
-                moduleText.on("drag", (event) => {
+                moduleText.on('drag', (event) => {
                     event.cancelBubble = true;
                     this.setGuideLinePosition(moduleGroup);
                 });
@@ -260,27 +260,27 @@ export class ZrenderAchieve {
      * @returns Group
      */
     createGuideLineGroup() {
-        const getGuideLineConfig = getZrenderConfig("guideLineConfig");
+        const getGuideLineConfig = getZrenderConfig('guideLineConfig');
         const guideLineGroup = this.createGroup({
             name: guideLineGroupName,
-            ignore: false,
+            ignore: false
         });
         const { LINE_TOP, LINE_RIGHT, LINE_BOTTOM, LINE_LEFT } = EGuideLineName;
         const lineTop = this.createLineShape({
             name: LINE_TOP,
-            ...getGuideLineConfig,
+            ...getGuideLineConfig
         });
         const lineRight = this.createLineShape({
             name: LINE_RIGHT,
-            ...getGuideLineConfig,
+            ...getGuideLineConfig
         });
         const lineBottom = this.createLineShape({
             name: LINE_BOTTOM,
-            ...getGuideLineConfig,
+            ...getGuideLineConfig
         });
         const lineLeft = this.createLineShape({
             name: LINE_LEFT,
-            ...getGuideLineConfig,
+            ...getGuideLineConfig
         });
         return guideLineGroup
             .add(lineTop)
@@ -295,9 +295,9 @@ export class ZrenderAchieve {
     createStandardLineGroup() {
         const standardLineGroup = this.createGroup({
             name: standardLineGroupName,
-            ignore: !this.getStandardLineStatus(),
+            ignore: !this.getStandardLineStatus()
         });
-        const getStandardLineConfig = getZrenderConfig("standardLineConfig");
+        const getStandardLineConfig = getZrenderConfig('standardLineConfig');
         const { zrW, zrH } = this.getZrInfo();
         const Xline = this.createLineShape({
             ...getStandardLineConfig,
@@ -305,9 +305,9 @@ export class ZrenderAchieve {
                 x1: zrW / 2,
                 y1: 0,
                 x2: zrW / 2,
-                y2: zrH,
+                y2: zrH
             },
-            draggable: "horizontal",
+            draggable: 'horizontal'
         });
         const Yline = this.createLineShape({
             ...getStandardLineConfig,
@@ -315,9 +315,9 @@ export class ZrenderAchieve {
                 x1: 0,
                 y1: zrH / 2,
                 x2: zrW,
-                y2: zrH / 2,
+                y2: zrH / 2
             },
-            draggable: "vertical",
+            draggable: 'vertical'
         });
         return standardLineGroup.add(Xline).add(Yline);
     }
@@ -325,7 +325,7 @@ export class ZrenderAchieve {
      * 修改
      */
     updateModule(module, name, k, v) {
-        if (k === "group.zoom") {
+        if (k === 'group.zoom') {
             this.updateGroupModule(module, k, v);
         }
         else {
@@ -342,17 +342,17 @@ export class ZrenderAchieve {
         this.setGuideLinePosition(module);
     }
     updateGroupModule(group, k, v) {
-        group.attr("scaleX", +v);
-        group.attr("scaleY", +v);
+        group.attr('scaleX', +v);
+        group.attr('scaleY', +v);
     }
     updateGroupTextModule(group, name, k, v) {
-        const paramsList = k.split(".");
+        const paramsList = k.split('.');
         const attrName = paramsList.shift();
         group.childOfName(name).attr(attrName, stringToObject(paramsList, v));
     }
     updateStandardLineGroup(ignoreStatus) {
         const standardLineGroup = this.getFindRootGroup(standardLineGroupName);
-        standardLineGroup.attr("ignore", !ignoreStatus);
+        standardLineGroup.attr('ignore', !ignoreStatus);
     }
     /**
      * 辅助
@@ -372,7 +372,7 @@ export class ZrenderAchieve {
         let _x = x;
         let _y = y;
         const guideLineGroup = this.getFindRootGroup(guideLineGroupName);
-        guideLineGroup.attr("ignore", false);
+        guideLineGroup.attr('ignore', false);
         console.log(group);
         const minx = Math.min(...group.children().map((e) => e.x));
         const miny = Math.min(...group.children().map((e) => e.y));
@@ -387,29 +387,29 @@ export class ZrenderAchieve {
         const lineBottom = guideLineGroup.childOfName(LINE_BOTTOM);
         const lineLeft = guideLineGroup.childOfName(LINE_LEFT);
         const lineRight = guideLineGroup.childOfName(LINE_RIGHT);
-        lineTop.attr("shape", {
+        lineTop.attr('shape', {
             x1: 0,
             y1: _y,
             x2: zrW,
-            y2: _y,
+            y2: _y
         });
-        lineBottom.attr("shape", {
+        lineBottom.attr('shape', {
             x1: 0,
             y1: _y + h * scaleY,
             x2: zrW,
-            y2: _y + h * scaleY,
+            y2: _y + h * scaleY
         });
-        lineLeft.attr("shape", {
+        lineLeft.attr('shape', {
             x1: _x,
             y1: 0,
             x2: _x,
-            y2: zrH,
+            y2: zrH
         });
-        lineRight.attr("shape", {
+        lineRight.attr('shape', {
             x1: _x + w * scaleX,
             y1: 0,
             x2: _x + w * scaleX,
-            y2: zrH,
+            y2: zrH
         });
     }
     /**
@@ -429,7 +429,7 @@ export class ZrenderAchieve {
         let flag = true;
         w *= scaleX;
         h *= scaleY;
-        const { x: textX, y: textY } = group.childOfName("text");
+        const { x: textX, y: textY } = group.childOfName('text');
         if (zrW - w <= x) {
             x = zrW - w;
         }
@@ -438,10 +438,10 @@ export class ZrenderAchieve {
             x = 0;
         }
         if (textX < 0 && x + textX < 0) {
-            group.childOfName("text").attr("x", -x);
+            group.childOfName('text').attr('x', -x);
             flag = false;
         }
-        console.log("parent x,textX", x, textX);
+        console.log('parent x,textX', x, textX);
         if (zrH - h <= y) {
             y = zrH - h;
         }
@@ -450,11 +450,11 @@ export class ZrenderAchieve {
             y = 0;
         }
         if (textY < 0 && y + textY < 0) {
-            group.childOfName("text").attr("y", -y);
+            group.childOfName('text').attr('y', -y);
             flag = false;
         }
-        group.attr("x", x);
-        group.attr("y", y);
+        group.attr('x', x);
+        group.attr('y', y);
         //往小缩放，不处理
         if (wheelDelta && wheelDelta < 0) {
             flag = true;
@@ -469,7 +469,7 @@ export class ZrenderAchieve {
     }
     updateGuideLineStatus(status) {
         const guideLineGroup = this.getFindRootGroup(guideLineGroupName);
-        guideLineGroup.attr("ignore", status);
+        guideLineGroup.attr('ignore', status);
     }
     getUpdateGuideLineStatus() {
         return this.globalGuideLineStatus;
@@ -538,7 +538,7 @@ export class ZrenderAchieve {
         const zrH = zr.getHeight();
         return {
             zrW,
-            zrH,
+            zrH
         };
     }
     getFindRootGroup(name) {

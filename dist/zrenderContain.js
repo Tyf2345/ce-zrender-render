@@ -1,5 +1,5 @@
-import { download, pipeFn } from "./utils";
-import { ZrenderAchieve } from "./zrenderAchieve";
+import { download, pipeFn } from './utils';
+import { ZrenderAchieve } from './zrenderAchieve';
 // | "application/pdf";
 /**
  * zrender渲染容器，包含撤销、前进、重做、保存
@@ -17,13 +17,13 @@ export default class ZrenderContain extends ZrenderAchieve {
      * 重做
      */
     redo() {
-        pipeFn(() => this.clearZrender(), () => this.init(), () => this.pubSub.publish("group", {}, {}))();
+        pipeFn(() => this.clearZrender(), () => this.init(), () => this.pubSub.publish('group', {}, {}))();
     }
     save(type) {
         // console.log(this.getZr());
         // return;
         switch (type) {
-            case "psd":
+            case 'psd':
                 this.savePsd();
                 break;
             default:
@@ -32,7 +32,7 @@ export default class ZrenderContain extends ZrenderAchieve {
         }
     }
     savePsd() {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
     saveImg(type) {
         const standardLineStatus = this.getStandardLineStatus();
@@ -42,7 +42,7 @@ export default class ZrenderContain extends ZrenderAchieve {
             const canvasDom = this.getZr().dom.children[0].children[0];
             canvasDom.toBlob((blob) => {
                 this.updateGuideLineGlobalStatus(standardLineStatus);
-                download(blob, `${crypto.randomUUID()}.${type.split("/")[1]}`);
+                download(blob, `${crypto.randomUUID()}.${type.split('/')[1]}`);
             }, type);
         });
     }

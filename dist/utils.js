@@ -1,4 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function pipeFn(...fns) {
+    // eslint-disable-next-line @typescript-eslint/ban-types
     return (...args) => {
         for (const fn of fns) {
             let res;
@@ -17,7 +19,7 @@ export function pipeFn(...fns) {
 }
 export function download(blob, name) {
     const bolbStr = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     // const blobStr = blob
     a.href = bolbStr;
     a.download = name;
@@ -28,17 +30,17 @@ export function getGroupData(group) {
     const textList = group
         .children()
         .slice()
-        .filter((w) => w.type === "text");
+        .filter((w) => w.type === 'text');
     const props = {
         zoom: group.scaleX,
-        textStyle: textList.map((w) => ({ ...w.style, name: w.name })),
+        textStyle: textList.map((w) => ({ ...w.style, name: w.name }))
         // backgroundColor: "",
         // fontWeight: 0,
         // text: "",
         // fill: "",
         // fontSize: 0,
     };
-    console.log(group, "group", props);
+    console.log(group, 'group', props);
     return props;
     // const list: TGroupDataRes = [];
     // group.eachChild((w) => {

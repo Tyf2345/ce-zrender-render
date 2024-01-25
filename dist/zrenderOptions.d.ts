@@ -78,7 +78,7 @@ export interface IZrenderAchieveOptions {
      *  "relative" 相对定位 x,y从画布组(0,0)点计算
      * @default relative
      */
-    renderPosition?: "fixed" | "relative";
+    renderPosition?: 'fixed' | 'relative';
     /**
      * 画布宽度，默认获取当前节点 clientWidth
      * @default dom.clientWidth
