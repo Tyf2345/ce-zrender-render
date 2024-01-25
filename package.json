@@ -1,16 +1,20 @@
 {
 	"name": "ce-zrender-render",
 	"version": "1.0.0",
-	"description": "",
+	"description": "ceMeta zrender商品图渲染库",
 	"main": "./dist/zrenderContain.js",
 	"scripts": {
 		"build": "pnpm clear:dist && tsc",
 		"clear:dist": "rimraf ./dist",
 		"lint": "eslint --ext .ts --fix --quiet ./src"
 	},
-	"keywords": [],
+	"keywords": ["zrender"],
 	"author": "",
 	"license": "ISC",
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:Tyf2345/ce-zrender-render.git"
+	},
 	"dependencies": {
 		"zrender": "^5.4.4"
 	},
@@ -27,5 +31,8 @@
 		"prettier": "^3.2.4",
 		"rimraf": "^5.0.5",
 		"typescript": "^5.3.3"
-	}
+	},
+	"files": [
+		"dist"
+	]
 }
