@@ -1,9 +1,8 @@
 {
 	"name": "ce-zrender-render",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "ceMeta zrender商品图渲染库",
-	"main": "./dist",
-  "types": "./dist",
+	"main": "./dist/zrenderContain.js",
 	"scripts": {
 		"build": "pnpm clear:dist && tsc",
 		"clear:dist": "rimraf ./dist",
