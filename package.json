@@ -2,13 +2,16 @@
 	"name": "ce-zrender-render",
 	"version": "1.0.3",
 	"description": "ceMeta zrender商品图渲染库",
-	"main": "./dist/zrenderContain.js",
+	"main": "./dist/index.js",
+	"types": "./dist/types/*.d.ts",
 	"scripts": {
-		"build": "pnpm clear:dist && tsc",
+		"build": "pnpm lint && pnpm clear:dist && rollup --bundleConfigAsCjs --config scripts/rollup/index.js",
 		"clear:dist": "rimraf ./dist",
 		"lint": "eslint --ext .ts --fix --quiet ./src"
 	},
-	"keywords": ["zrender"],
+	"keywords": [
+		"zrender"
+	],
 	"author": "",
 	"license": "ISC",
 	"repository": {
@@ -21,6 +24,7 @@
 	"devDependencies": {
 		"@commitlint/cli": "^18.5.0",
 		"@commitlint/config-conventional": "^18.5.0",
+		"@rollup/plugin-typescript": "^11.1.6",
 		"@typescript-eslint/eslint-plugin": "^6.19.1",
 		"@typescript-eslint/parser": "^6.19.1",
 		"commitlint": "^18.5.0",
@@ -30,9 +34,7 @@
 		"husky": "^8.0.3",
 		"prettier": "^3.2.4",
 		"rimraf": "^5.0.5",
+		"rollup": "^4.9.6",
 		"typescript": "^5.3.3"
-	},
-	"files": [
-		"dist"
-	]
+	}
 }
