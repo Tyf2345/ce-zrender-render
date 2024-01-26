@@ -14,10 +14,12 @@ export declare class ZrenderAchieve {
     private globalMousewheelStatus;
     private globalTextStatus;
     private globalZStatus;
+    private backgroundGroupStypeProps;
     private zr;
     private historyList;
     private renderPosition;
     static _that: ZrenderAchieve;
+    private retrievedRect;
     canvasHeight: number;
     canvasWidth: number;
     fileHeight: number;
@@ -37,6 +39,7 @@ export declare class ZrenderAchieve {
     removeToZr(ele: zrender.Element): this;
     clearZrender(): void;
     resizeZrender(): void;
+    calcRetrievedRect(): void;
     listenGroupEvent(group: zrender.Group): void;
     /**
      * 创建
@@ -69,9 +72,9 @@ export declare class ZrenderAchieve {
     /**
      * 修改
      */
-    updateModule(module: zrender.Group, name: string, k: string, v: string | number): void;
-    updateGroupModule(group: zrender.Group, k: string, v: string | number): void;
-    updateGroupTextModule(group: zrender.Group, name: string, k: string, v: string | number): void;
+    updateModule(name: string, k: string, v: string | number): void;
+    updateGroupModule(name: string, k: string, v: string | number): void;
+    updateGroupTextModule(name: string, k: string, v: string | number): void;
     updateStandardLineGroup(ignoreStatus: boolean): void;
     /**
      * 辅助

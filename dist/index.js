@@ -190,10 +190,12 @@
         globalMousewheelStatus;
         globalTextStatus;
         globalZStatus;
+        backgroundGroupStypeProps = {};
         zr;
         historyList;
         renderPosition;
         static _that;
+        retrievedRect = {};
         canvasHeight;
         canvasWidth;
         fileHeight;
@@ -236,6 +238,7 @@
         init() {
             this.initZr();
             this.renderCanvas();
+            this.calcRetrievedRect();
         }
         initZr(config) {
             if (this.domountNode === null) {
@@ -265,6 +268,18 @@
         }
         resizeZrender() {
             this.zr.resize();
+        }
+        calcRetrievedRect() {
+            const roots = this.zr.storage.getRoots();
+            let queueList = [...roots];
+            while (queueList.length) {
+                const elementProps = queueList.shift();
+                this.retrievedRect[elementProps.name] = elementProps;
+                if (elementProps.children?.()?.length) {
+                    queueList.push(...elementProps.children());
+                }
+            }
+            queueList = [];
         }
         listenGroupEvent(group) {
             group
@@ -306,7 +321,8 @@
                 name: backgroundImageName,
                 style: {
                     width: zrW,
-                    height: zrH
+                    height: zrH,
+                    ...this.backgroundGroupStypeProps
                     // image: config.src,
                 }
             }));
@@ -315,7 +331,8 @@
         updateBackgroundGroup(styleProps) {
             const backgroundGroup = this.getFindRootGroup(backgroundGroupName);
             const backgroundImage = backgroundGroup.childOfName(backgroundImageName);
-            backgroundImage.attr('style', styleProps);
+            this.backgroundGroupStypeProps = styleProps || {};
+            backgroundImage.attr('style', this.backgroundGroupStypeProps);
         }
         /**
          * 创建固定位置模块
@@ -324,12 +341,12 @@
             const currentConfig = this.currentRenderCanvasConfig;
             const templateGroup = this.createGroup({ name: moduleGroupName });
             currentConfig.templateImgList.forEach((templateImg, idx) => {
-                const { src, width, height, x, y, name } = templateImg;
+                const { src, width, height, x, y } = templateImg;
                 const templateImageGroup = this.createGroup({
-                    name: `group_image_${idx}`
+                    name: `imageContentGroup_${idx}`
                 });
                 const moduleImage = this.createImageShape({
-                    name: name || 'image_' + idx,
+                    name: 'imageContent_' + idx,
                     draggable: true,
                     style: {
                         image: src,
@@ -344,11 +361,13 @@
             });
             currentConfig.textList.forEach((templateText, idx) => {
                 const { content, color, fontFamily, fontSize, fontWidth, x, y } = templateText;
-                const templateTextGroup = this.createGroup({ name: `group_text_${idx}` });
+                const templateTextGroup = this.createGroup({
+                    name: `textContentGroup_${idx}`
+                });
                 const moduleText = this.createTextShape({
                     x: x / this.widthRatio(),
                     y: y / this.heightRatio(),
-                    name: `text_${idx}`,
+                    name: `textContent_${idx}`,
                     draggable: true,
                     style: {
                         // backgroundColor: "transparent",
@@ -374,8 +393,9 @@
         createModuleGroup() {
             const templateGroup = this.createGroup({ name: moduleGroupName });
             const currentConfig = this.currentRenderCanvasConfig;
-            currentConfig.templateImgList.forEach((w) => {
+            currentConfig.templateImgList.forEach((w, idx) => {
                 const moduleGroup = this.createGroup({
+                    name: `contentGroup_${idx}`,
                     draggable: true,
                     x: w.x / this.widthRatio(),
                     y: w.y / this.heightRatio()
@@ -383,7 +403,7 @@
                 // 加载图片
                 if (w.src) {
                     const moduleImage = this.createImageShape({
-                        name: 'image',
+                        name: `image_${idx}`,
                         // draggable: true,
                         style: {
                             width: w.width / this.widthRatio(),
@@ -394,11 +414,11 @@
                     moduleGroup.add(moduleImage);
                 }
                 // 加载文字
-                w.textList?.forEach((textElement, idx) => {
+                w.textList?.forEach((textElement, _idx) => {
                     const moduleText = this.createTextShape({
                         x: textElement.x,
                         y: textElement.y,
-                        name: `text_${idx}`,
+                        name: `text_${idx}_${_idx}`,
                         draggable: true,
                         style: {
                             ...textElement
@@ -466,6 +486,7 @@
             const getStandardLineConfig = getZrenderConfig('standardLineConfig');
             const { zrW, zrH } = this.getZrInfo();
             const Xline = this.createLineShape({
+                name: 'standardLineX',
                 ...getStandardLineConfig,
                 shape: {
                     x1: zrW / 2,
@@ -476,6 +497,7 @@
                 draggable: 'horizontal'
             });
             const Yline = this.createLineShape({
+                name: 'standardLineY',
                 ...getStandardLineConfig,
                 shape: {
                     x1: 0,
@@ -490,12 +512,12 @@
         /**
          * 修改
          */
-        updateModule(module, name, k, v) {
+        updateModule(name, k, v) {
             if (k === 'group.zoom') {
-                this.updateGroupModule(module, k, v);
+                this.updateGroupModule(name, k, v);
             }
             else {
-                this.updateGroupTextModule(module, name, k, v);
+                this.updateGroupTextModule(name, k, v);
             }
             // switch (module.type) {
             //   case "group":
@@ -505,16 +527,16 @@
             //     break;
             // }
             // 重新绘制辅助线
-            this.setGuideLinePosition(module);
+            // this.setGuideLinePosition(module);
         }
-        updateGroupModule(group, k, v) {
-            group.attr('scaleX', +v);
-            group.attr('scaleY', +v);
+        updateGroupModule(name, k, v) {
+            this.retrievedRect[name].attr('scaleX', +v);
+            this.retrievedRect[name].attr('scaleY', +v);
         }
-        updateGroupTextModule(group, name, k, v) {
+        updateGroupTextModule(name, k, v) {
             const paramsList = k.split('.');
             const attrName = paramsList.shift();
-            group.childOfName(name).attr(attrName, stringToObject(paramsList, v));
+            this.retrievedRect[name].attr(attrName, stringToObject(paramsList, v));
         }
         updateStandardLineGroup(ignoreStatus) {
             const standardLineGroup = this.getFindRootGroup(standardLineGroupName);
@@ -559,7 +581,6 @@
                 group.childOfName('text').attr('x', -x);
                 flag = false;
             }
-            console.log('parent x,textX', x, textX);
             if (zrH - h <= y) {
                 y = zrH - h;
             }

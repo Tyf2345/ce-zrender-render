@@ -35,11 +35,12 @@ export class ZrenderAchieve {
 	private globalMousewheelStatus: boolean;
 	private globalTextStatus: boolean;
 	private globalZStatus: boolean;
+	private backgroundGroupStypeProps: zrender.ImageProps = {};
 	private zr: zrender.ZRenderType | null;
 	private historyList: (IRelativeConfig | IFixedConfig)[];
 	private renderPosition: IZrenderAchieveOptions['renderPosition'];
 	static _that: ZrenderAchieve;
-
+	private retrievedRect: Record<string, zrender.Group> = {};
 	canvasHeight: number;
 	canvasWidth: number;
 	fileHeight: number;
@@ -102,6 +103,7 @@ export class ZrenderAchieve {
 	init() {
 		this.initZr();
 		this.renderCanvas();
+		this.calcRetrievedRect();
 	}
 
 	initZr(config?: zrender.ZRenderInitOpt) {
@@ -134,6 +136,19 @@ export class ZrenderAchieve {
 	}
 	resizeZrender() {
 		this.zr!.resize();
+	}
+
+	calcRetrievedRect() {
+		const roots = this.zr!.storage.getRoots() as zrender.Group[];
+		let queueList: zrender.Group[] = [...roots];
+		while (queueList.length) {
+			const elementProps = queueList.shift()!;
+			this.retrievedRect[elementProps.name!] = elementProps;
+			if (elementProps.children?.()?.length) {
+				queueList.push(...(elementProps!.children() as zrender.Group[]));
+			}
+		}
+		queueList = [];
 	}
 	listenGroupEvent(group: zrender.Group) {
 		group
@@ -192,7 +207,8 @@ export class ZrenderAchieve {
 				name: backgroundImageName,
 				style: {
 					width: zrW,
-					height: zrH
+					height: zrH,
+					...this.backgroundGroupStypeProps
 					// image: config.src,
 				}
 			})
@@ -206,7 +222,8 @@ export class ZrenderAchieve {
 		const backgroundImage = backgroundGroup.childOfName(
 			backgroundImageName
 		) as zrender.Image;
-		backgroundImage.attr('style', styleProps);
+		this.backgroundGroupStypeProps = styleProps || {};
+		backgroundImage.attr('style', this.backgroundGroupStypeProps);
 	}
 
 	/**
@@ -216,12 +233,12 @@ export class ZrenderAchieve {
 		const currentConfig = this.currentRenderCanvasConfig as IFixedConfig;
 		const templateGroup = this.createGroup({ name: moduleGroupName });
 		currentConfig.templateImgList.forEach((templateImg, idx) => {
-			const { src, width, height, x, y, name } = templateImg;
+			const { src, width, height, x, y } = templateImg;
 			const templateImageGroup = this.createGroup({
-				name: `group_image_${idx}`
+				name: `imageContentGroup_${idx}`
 			});
 			const moduleImage = this.createImageShape({
-				name: name || 'image_' + idx,
+				name: 'imageContent_' + idx,
 				draggable: true,
 				style: {
 					image: src,
@@ -238,11 +255,13 @@ export class ZrenderAchieve {
 		currentConfig.textList.forEach((templateText, idx) => {
 			const { content, color, fontFamily, fontSize, fontWidth, x, y } =
 				templateText;
-			const templateTextGroup = this.createGroup({ name: `group_text_${idx}` });
+			const templateTextGroup = this.createGroup({
+				name: `textContentGroup_${idx}`
+			});
 			const moduleText = this.createTextShape({
 				x: x / this.widthRatio(),
 				y: y / this.heightRatio(),
-				name: `text_${idx}`,
+				name: `textContent_${idx}`,
 				draggable: true,
 				style: {
 					// backgroundColor: "transparent",
@@ -270,8 +289,9 @@ export class ZrenderAchieve {
 	createModuleGroup() {
 		const templateGroup = this.createGroup({ name: moduleGroupName });
 		const currentConfig = this.currentRenderCanvasConfig as IRelativeConfig;
-		currentConfig.templateImgList.forEach((w) => {
+		currentConfig.templateImgList.forEach((w, idx) => {
 			const moduleGroup = this.createGroup({
+				name: `contentGroup_${idx}`,
 				draggable: true,
 				x: w.x / this.widthRatio(),
 				y: w.y / this.heightRatio()
@@ -280,7 +300,7 @@ export class ZrenderAchieve {
 			// 加载图片
 			if (w.src) {
 				const moduleImage = this.createImageShape({
-					name: 'image',
+					name: `image_${idx}`,
 					// draggable: true,
 					style: {
 						width: w.width / this.widthRatio(),
@@ -292,11 +312,11 @@ export class ZrenderAchieve {
 			}
 
 			// 加载文字
-			w.textList?.forEach((textElement, idx) => {
+			w.textList?.forEach((textElement, _idx) => {
 				const moduleText = this.createTextShape({
 					x: textElement.x,
 					y: textElement.y,
-					name: `text_${idx}`,
+					name: `text_${idx}_${_idx}`,
 					draggable: true,
 					style: {
 						...textElement
@@ -367,6 +387,7 @@ export class ZrenderAchieve {
 		const getStandardLineConfig = getZrenderConfig('standardLineConfig');
 		const { zrW, zrH } = this.getZrInfo();
 		const Xline = this.createLineShape({
+			name: 'standardLineX',
 			...getStandardLineConfig,
 			shape: {
 				x1: zrW / 2,
@@ -377,6 +398,7 @@ export class ZrenderAchieve {
 			draggable: 'horizontal'
 		});
 		const Yline = this.createLineShape({
+			name: 'standardLineY',
 			...getStandardLineConfig,
 			shape: {
 				x1: 0,
@@ -392,16 +414,11 @@ export class ZrenderAchieve {
 	/**
 	 * 修改
 	 */
-	updateModule(
-		module: zrender.Group,
-		name: string,
-		k: string,
-		v: string | number
-	) {
+	updateModule(name: string, k: string, v: string | number) {
 		if (k === 'group.zoom') {
-			this.updateGroupModule(module, k, v);
+			this.updateGroupModule(name, k, v);
 		} else {
-			this.updateGroupTextModule(module, name, k, v);
+			this.updateGroupTextModule(name, k, v);
 		}
 		// switch (module.type) {
 		//   case "group":
@@ -412,21 +429,16 @@ export class ZrenderAchieve {
 		//     break;
 		// }
 		// 重新绘制辅助线
-		this.setGuideLinePosition(module);
+		// this.setGuideLinePosition(module);
 	}
-	updateGroupModule(group: zrender.Group, k: string, v: string | number) {
-		group.attr('scaleX', +v);
-		group.attr('scaleY', +v);
+	updateGroupModule(name: string, k: string, v: string | number) {
+		this.retrievedRect[name].attr('scaleX', +v);
+		this.retrievedRect[name].attr('scaleY', +v);
 	}
-	updateGroupTextModule(
-		group: zrender.Group,
-		name: string,
-		k: string,
-		v: string | number
-	) {
+	updateGroupTextModule(name: string, k: string, v: string | number) {
 		const paramsList: string[] = k.split('.');
 		const attrName = paramsList.shift() as keyof zrender.ElementProps;
-		group.childOfName(name).attr(attrName, stringToObject(paramsList, v));
+		this.retrievedRect[name].attr(attrName, stringToObject(paramsList, v));
 	}
 
 	updateStandardLineGroup(ignoreStatus: boolean) {
@@ -527,8 +539,6 @@ export class ZrenderAchieve {
 			group.childOfName('text').attr('x', -x);
 			flag = false;
 		}
-		console.log('parent x,textX', x, textX);
-
 		if (zrH - h <= y) {
 			y = zrH - h;
 		}
