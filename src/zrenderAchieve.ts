@@ -35,7 +35,7 @@ export class ZrenderAchieve {
 	private globalMousewheelStatus: boolean;
 	private globalTextStatus: boolean;
 	private globalZStatus: boolean;
-	private backgroundGroupStypeProps: zrender.ImageProps = {};
+	private backgroundGroupStypeProps: zrender.ImageStyleProps = {};
 	private zr: zrender.ZRenderType | null;
 	private historyList: (IRelativeConfig | IFixedConfig)[];
 	private renderPosition: IZrenderAchieveOptions['renderPosition'];
@@ -208,8 +208,10 @@ export class ZrenderAchieve {
 				style: {
 					width: zrW,
 					height: zrH,
-					...this.backgroundGroupStypeProps
-					// image: config.src,
+					...this.backgroundGroupStypeProps,
+					image: this.getCrossImage(
+						this.backgroundGroupStypeProps.image as string
+					)
 				}
 			})
 		);
@@ -223,7 +225,10 @@ export class ZrenderAchieve {
 			backgroundImageName
 		) as zrender.Image;
 		this.backgroundGroupStypeProps = styleProps || {};
-		backgroundImage.attr('style', this.backgroundGroupStypeProps);
+		backgroundImage.attr('style', {
+			...this.backgroundGroupStypeProps,
+			image: this.getCrossImage(this.backgroundGroupStypeProps.image as string)
+		});
 	}
 
 	/**
@@ -241,7 +246,7 @@ export class ZrenderAchieve {
 				name: 'imageContent_' + idx,
 				draggable: true,
 				style: {
-					image: src,
+					image: this.getCrossImage(src),
 					width: width / this.widthRatio(),
 					height: height / this.heightRatio(),
 					x: x / this.widthRatio(),
@@ -305,7 +310,7 @@ export class ZrenderAchieve {
 					style: {
 						width: w.width / this.widthRatio(),
 						height: w.height / this.heightRatio(),
-						image: w.src
+						image: this.getCrossImage(w.src)
 					}
 				});
 				moduleGroup.add(moduleImage);
@@ -661,5 +666,13 @@ export class ZrenderAchieve {
 	}
 	widthRatio() {
 		return this.fileWidth / this.canvasWidth;
+	}
+
+	getCrossImage(src?: string) {
+		if (!src) return undefined;
+		const img = new Image();
+		img.src = src;
+		img.crossOrigin = 'Anonymous';
+		return img;
 	}
 }

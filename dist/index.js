@@ -322,8 +322,8 @@
                 style: {
                     width: zrW,
                     height: zrH,
-                    ...this.backgroundGroupStypeProps
-                    // image: config.src,
+                    ...this.backgroundGroupStypeProps,
+                    image: this.getCrossImage(this.backgroundGroupStypeProps.image)
                 }
             }));
             return backgroundGroup;
@@ -332,7 +332,10 @@
             const backgroundGroup = this.getFindRootGroup(backgroundGroupName);
             const backgroundImage = backgroundGroup.childOfName(backgroundImageName);
             this.backgroundGroupStypeProps = styleProps || {};
-            backgroundImage.attr('style', this.backgroundGroupStypeProps);
+            backgroundImage.attr('style', {
+                ...this.backgroundGroupStypeProps,
+                image: this.getCrossImage(this.backgroundGroupStypeProps.image)
+            });
         }
         /**
          * 创建固定位置模块
@@ -349,7 +352,7 @@
                     name: 'imageContent_' + idx,
                     draggable: true,
                     style: {
-                        image: src,
+                        image: this.getCrossImage(src),
                         width: width / this.widthRatio(),
                         height: height / this.heightRatio(),
                         x: x / this.widthRatio(),
@@ -408,7 +411,7 @@
                         style: {
                             width: w.width / this.widthRatio(),
                             height: w.height / this.heightRatio(),
-                            image: w.src
+                            image: this.getCrossImage(w.src)
                         }
                     });
                     moduleGroup.add(moduleImage);
@@ -688,6 +691,14 @@
         }
         widthRatio() {
             return this.fileWidth / this.canvasWidth;
+        }
+        getCrossImage(src) {
+            if (!src)
+                return undefined;
+            const img = new Image();
+            img.src = src;
+            img.crossOrigin = 'Anonymous';
+            return img;
         }
     }
 

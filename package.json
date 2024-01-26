@@ -1,6 +1,6 @@
 {
 	"name": "ce-zrender-render",
-	"version": "1.0.6",
+	"version": "1.0.7",
 	"description": "ceMeta zrender商品图渲染库",
 	"main": "./dist/index.js",
 	"types": "./dist/types/index.d.ts",
