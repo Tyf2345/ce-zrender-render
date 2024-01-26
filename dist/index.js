@@ -695,6 +695,8 @@
         getCrossImage(src) {
             if (!src)
                 return undefined;
+            if (!src.startsWith('http'))
+                return src;
             const img = new Image();
             img.src = src;
             img.crossOrigin = 'Anonymous';

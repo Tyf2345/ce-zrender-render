@@ -670,6 +670,7 @@ export class ZrenderAchieve {
 
 	getCrossImage(src?: string) {
 		if (!src) return undefined;
+		if (!src.startsWith('http')) return src;
 		const img = new Image();
 		img.src = src;
 		img.crossOrigin = 'Anonymous';

@@ -125,5 +125,5 @@ export declare class ZrenderAchieve {
     getFindRootGroup(name: string): zrender.Element<zrender.ElementProps>;
     heightRatio(): number;
     widthRatio(): number;
-    getCrossImage(src?: string): HTMLImageElement | undefined;
+    getCrossImage(src?: string): string | HTMLImageElement | undefined;
 }
