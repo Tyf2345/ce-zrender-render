@@ -729,8 +729,7 @@
             const standardLineStatus = this.getStandardLineStatus();
             this.updateStandardLineGlobalStatus(false);
             window.requestAnimationFrame(() => {
-                // @ts-ignore
-                const canvasDom = this.getZr().dom.children[0].children[0];
+                const canvasDom = this.getZr().dom.querySelector('canvas');
                 canvasDom.toBlob((blob) => {
                     this.updateGuideLineGlobalStatus(standardLineStatus);
                     download(blob, `${crypto.randomUUID()}.${type.split('/')[1]}`);
