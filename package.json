@@ -1,9 +1,9 @@
 {
 	"name": "ce-zrender-render",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"description": "ceMeta zrender商品图渲染库",
 	"main": "./dist/index.js",
-	"types": "./dist/types/*.d.ts",
+	"types": "./dist/types/index.d.ts",
 	"scripts": {
 		"build": "pnpm lint && pnpm clear:dist && rollup --bundleConfigAsCjs --config scripts/rollup/index.js",
 		"clear:dist": "rimraf ./dist",
