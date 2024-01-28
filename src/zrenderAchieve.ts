@@ -13,6 +13,11 @@ import {
 	standardLineGroupName
 } from './zrenderConfig';
 import { PubSub, getGroupData, pipeFn, stringToObject } from './utils';
+//修复打包报错问题
+import CanvasPainter from 'zrender/lib/canvas/Painter';
+import SVGPainter from 'zrender/lib/svg/Painter';
+zrender.registerPainter('canvas', CanvasPainter);
+zrender.registerPainter('svg', SVGPainter);
 
 enum EGuideLineName {
 	LINE_TOP = 'lineTop',

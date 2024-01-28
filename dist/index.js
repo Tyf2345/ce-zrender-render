@@ -1,8 +1,8 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('zrender')) :
-    typeof define === 'function' && define.amd ? define(['zrender'], factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global["ce-zrender-render"] = factory(global.zrender));
-})(this, (function (zrender) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('zrender'), require('zrender/lib/canvas/Painter'), require('zrender/lib/svg/Painter')) :
+    typeof define === 'function' && define.amd ? define(['zrender', 'zrender/lib/canvas/Painter', 'zrender/lib/svg/Painter'], factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global["ce-zrender-render"] = factory(global.zrender, global.CanvasPainter, global.SVGPainter));
+})(this, (function (zrender, CanvasPainter, SVGPainter) { 'use strict';
 
     function _interopNamespaceDefault(e) {
         var n = Object.create(null);
@@ -167,6 +167,8 @@
     const backgroundImageName = 'backgroundImage';
     const moduleGroupName = 'moduleGroup';
 
+    zrender__namespace.registerPainter('canvas', CanvasPainter);
+    zrender__namespace.registerPainter('svg', SVGPainter);
     var EGuideLineName;
     (function (EGuideLineName) {
         EGuideLineName["LINE_TOP"] = "lineTop";
