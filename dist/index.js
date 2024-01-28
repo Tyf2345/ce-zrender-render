@@ -329,10 +329,8 @@
             return backgroundGroup;
         }
         updateBackgroundGroup(styleProps) {
-            const backgroundGroup = this.getFindRootGroup(backgroundGroupName);
-            const backgroundImage = backgroundGroup.childOfName(backgroundImageName);
             this.backgroundGroupStypeProps = styleProps || {};
-            backgroundImage.attr('style', {
+            this.retrievedRect[backgroundImageName].attr('style', {
                 ...this.backgroundGroupStypeProps,
                 image: this.getCrossImage(this.backgroundGroupStypeProps.image)
             });
