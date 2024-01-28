@@ -218,17 +218,16 @@ export class ZrenderAchieve {
 		return backgroundGroup;
 	}
 	updateBackgroundGroup(styleProps?: zrender.ImageStyleProps) {
-		const backgroundGroup = this.getFindRootGroup(
-			backgroundGroupName
-		) as zrender.Group;
-		const backgroundImage = backgroundGroup.childOfName(
-			backgroundImageName
-		) as zrender.Image;
 		this.backgroundGroupStypeProps = styleProps || {};
-		backgroundImage.attr('style', {
-			...this.backgroundGroupStypeProps,
-			image: this.getCrossImage(this.backgroundGroupStypeProps.image as string)
-		});
+		(this.retrievedRect[backgroundImageName] as unknown as zrender.Image).attr(
+			'style',
+			{
+				...this.backgroundGroupStypeProps,
+				image: this.getCrossImage(
+					this.backgroundGroupStypeProps.image as string
+				)
+			}
+		);
 	}
 
 	/**
