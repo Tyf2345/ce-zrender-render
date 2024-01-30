@@ -40,6 +40,8 @@ export class ZrenderAchieve {
 	private globalMousewheelStatus: boolean;
 	private globalTextStatus: boolean;
 	private globalZStatus: boolean;
+	private globalImageDraggable: boolean;
+	private globalTextDraggable: boolean;
 	private backgroundGroupStypeProps: zrender.ImageStyleProps = {};
 	private zr: zrender.ZRenderType | null;
 	private historyList: (IRelativeConfig | IFixedConfig)[];
@@ -61,6 +63,8 @@ export class ZrenderAchieve {
 			globalBorderLimitStatus = false,
 			globalMousewheelStatus = true,
 			globalTextStatus = false,
+			globalImageDraggable = true,
+			globalTextDraggable = true,
 			globalZStatus = false,
 			renderPosition = 'relative',
 			canvasHeight,
@@ -76,6 +80,8 @@ export class ZrenderAchieve {
 		this.globalBorderLimitStatus = globalBorderLimitStatus;
 		this.globalMousewheelStatus = globalMousewheelStatus;
 		this.globalTextStatus = globalTextStatus;
+		this.globalImageDraggable = globalImageDraggable;
+		this.globalTextDraggable = globalTextDraggable;
 		this.globalZStatus = globalZStatus;
 		this.renderPosition = renderPosition;
 		this.zr = null;
@@ -233,6 +239,9 @@ export class ZrenderAchieve {
 				)
 			}
 		);
+		// this.getZr().dom?.onclick();
+		// this.getZr().dom?.scrollTo({ top: 0 });
+		// alert(123);
 	}
 
 	/**
@@ -244,17 +253,18 @@ export class ZrenderAchieve {
 		currentConfig.templateImgList.forEach((templateImg, idx) => {
 			const { src, width, height, x, y } = templateImg;
 			const templateImageGroup = this.createGroup({
-				name: `imageContentGroup_${idx}`
+				name: `imageContentGroup_${idx}`,
+
+				draggable: this.getGlobalImageDraggable(),
+				x: x / this.widthRatio(),
+				y: y / this.heightRatio()
 			});
 			const moduleImage = this.createImageShape({
 				name: 'imageContent_' + idx,
-				draggable: true,
 				style: {
 					image: this.getCrossImage(src),
 					width: width / this.widthRatio(),
-					height: height / this.heightRatio(),
-					x: x / this.widthRatio(),
-					y: y / this.heightRatio()
+					height: height / this.heightRatio()
 				}
 			});
 			templateImageGroup.add(moduleImage);
@@ -265,13 +275,13 @@ export class ZrenderAchieve {
 			const { content, color, fontFamily, fontSize, fontWidth, x, y } =
 				templateText;
 			const templateTextGroup = this.createGroup({
-				name: `textContentGroup_${idx}`
-			});
-			const moduleText = this.createTextShape({
+				name: `textContentGroup_${idx}`,
 				x: x / this.widthRatio(),
 				y: y / this.heightRatio(),
+				draggable: this.getGlobalTextDraggable()
+			});
+			const moduleText = this.createTextShape({
 				name: `textContent_${idx}`,
-				draggable: true,
 				style: {
 					// backgroundColor: "transparent",
 					fontFamily,
@@ -287,7 +297,6 @@ export class ZrenderAchieve {
 		templateGroup
 			.children()
 			.forEach((w) => this.listenGroupEvent(w as zrender.Group));
-
 		return templateGroup;
 	}
 
@@ -456,6 +465,18 @@ export class ZrenderAchieve {
 		) as zrender.Group;
 		standardLineGroup.attr('ignore', !ignoreStatus);
 	}
+	getGlobalImageDraggable() {
+		return this.globalImageDraggable;
+	}
+	updateGlobalImageDraggable(globalImageDraggable: boolean) {
+		this.globalImageDraggable = globalImageDraggable;
+	}
+	getGlobalTextDraggable() {
+		return this.globalTextDraggable;
+	}
+	updateGlobalTextDraggable(globalTextDraggable: boolean) {
+		this.globalTextDraggable = globalTextDraggable;
+	}
 	/**
 	 * 辅助
 	 */
@@ -465,7 +486,6 @@ export class ZrenderAchieve {
 	 * @param group Group
 	 */
 	setGuideLinePosition(group: zrender.Group) {
-		return;
 		if (!this.getUpdateGuideLineStatus()) return;
 		// eslint-disable-next-line prefer-const
 		const { x, y, scaleX, scaleY } = group;

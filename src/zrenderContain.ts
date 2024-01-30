@@ -53,10 +53,11 @@ export default class ZrenderContain extends ZrenderAchieve {
 	saveImg(type: TSaveType) {
 		const standardLineStatus = this.getStandardLineStatus();
 		this.updateStandardLineGlobalStatus(false);
+		this.cleanSideEffects();
 		window.requestAnimationFrame(() => {
 			const canvasDom = this.getZr().dom!.querySelector('canvas')!;
 			canvasDom.toBlob((blob) => {
-				this.updateGuideLineGlobalStatus(standardLineStatus);
+				this.updateStandardLineGlobalStatus(standardLineStatus);
 				download(blob!, `${crypto.randomUUID()}.${type.split('/')[1]}`);
 			}, type);
 		});

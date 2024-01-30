@@ -14,6 +14,8 @@ export declare class ZrenderAchieve {
     private globalMousewheelStatus;
     private globalTextStatus;
     private globalZStatus;
+    private globalImageDraggable;
+    private globalTextDraggable;
     private backgroundGroupStypeProps;
     private zr;
     private historyList;
@@ -25,7 +27,7 @@ export declare class ZrenderAchieve {
     fileHeight: number;
     fileWidth: number;
     pubSub: PubSub;
-    constructor(domountNode: HTMLDivElement, currentRenderCanvasConfig: IRelativeConfig | IFixedConfig, { globalGuideLineStatus, globalStandardLineStatus, globalBorderLimitStatus, globalMousewheelStatus, globalTextStatus, globalZStatus, renderPosition, canvasHeight, canvasWidth, fileHeight, fileWidth }: IZrenderAchieveOptions);
+    constructor(domountNode: HTMLDivElement, currentRenderCanvasConfig: IRelativeConfig | IFixedConfig, { globalGuideLineStatus, globalStandardLineStatus, globalBorderLimitStatus, globalMousewheelStatus, globalTextStatus, globalImageDraggable, globalTextDraggable, globalZStatus, renderPosition, canvasHeight, canvasWidth, fileHeight, fileWidth }: IZrenderAchieveOptions);
     /**
      * 渲染
      */
@@ -76,6 +78,10 @@ export declare class ZrenderAchieve {
     updateGroupModule(name: string, k: string, v: string | number): void;
     updateGroupTextModule(name: string, k: string, v: string | number): void;
     updateStandardLineGroup(ignoreStatus: boolean): void;
+    getGlobalImageDraggable(): boolean;
+    updateGlobalImageDraggable(globalImageDraggable: boolean): void;
+    getGlobalTextDraggable(): boolean;
+    updateGlobalTextDraggable(globalTextDraggable: boolean): void;
     /**
      * 辅助
      */

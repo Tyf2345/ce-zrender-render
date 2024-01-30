@@ -192,6 +192,8 @@
         globalMousewheelStatus;
         globalTextStatus;
         globalZStatus;
+        globalImageDraggable;
+        globalTextDraggable;
         backgroundGroupStypeProps = {};
         zr;
         historyList;
@@ -203,7 +205,7 @@
         fileHeight;
         fileWidth;
         pubSub;
-        constructor(domountNode, currentRenderCanvasConfig, { globalGuideLineStatus = true, globalStandardLineStatus = false, globalBorderLimitStatus = false, globalMousewheelStatus = true, globalTextStatus = false, globalZStatus = false, renderPosition = 'relative', canvasHeight, canvasWidth, fileHeight, fileWidth }) {
+        constructor(domountNode, currentRenderCanvasConfig, { globalGuideLineStatus = true, globalStandardLineStatus = false, globalBorderLimitStatus = false, globalMousewheelStatus = true, globalTextStatus = false, globalImageDraggable = true, globalTextDraggable = true, globalZStatus = false, renderPosition = 'relative', canvasHeight, canvasWidth, fileHeight, fileWidth }) {
             this.domountNode = domountNode;
             this.currentRenderCanvasConfig = currentRenderCanvasConfig;
             this.pubSub = new PubSub();
@@ -213,6 +215,8 @@
             this.globalBorderLimitStatus = globalBorderLimitStatus;
             this.globalMousewheelStatus = globalMousewheelStatus;
             this.globalTextStatus = globalTextStatus;
+            this.globalImageDraggable = globalImageDraggable;
+            this.globalTextDraggable = globalTextDraggable;
             this.globalZStatus = globalZStatus;
             this.renderPosition = renderPosition;
             this.zr = null;
@@ -336,6 +340,9 @@
                 ...this.backgroundGroupStypeProps,
                 image: this.getCrossImage(this.backgroundGroupStypeProps.image)
             });
+            // this.getZr().dom?.onclick();
+            // this.getZr().dom?.scrollTo({ top: 0 });
+            // alert(123);
         }
         /**
          * 创建固定位置模块
@@ -346,17 +353,17 @@
             currentConfig.templateImgList.forEach((templateImg, idx) => {
                 const { src, width, height, x, y } = templateImg;
                 const templateImageGroup = this.createGroup({
-                    name: `imageContentGroup_${idx}`
+                    name: `imageContentGroup_${idx}`,
+                    draggable: this.getGlobalImageDraggable(),
+                    x: x / this.widthRatio(),
+                    y: y / this.heightRatio()
                 });
                 const moduleImage = this.createImageShape({
                     name: 'imageContent_' + idx,
-                    draggable: true,
                     style: {
                         image: this.getCrossImage(src),
                         width: width / this.widthRatio(),
-                        height: height / this.heightRatio(),
-                        x: x / this.widthRatio(),
-                        y: y / this.heightRatio()
+                        height: height / this.heightRatio()
                     }
                 });
                 templateImageGroup.add(moduleImage);
@@ -365,13 +372,13 @@
             currentConfig.textList.forEach((templateText, idx) => {
                 const { content, color, fontFamily, fontSize, fontWidth, x, y } = templateText;
                 const templateTextGroup = this.createGroup({
-                    name: `textContentGroup_${idx}`
-                });
-                const moduleText = this.createTextShape({
+                    name: `textContentGroup_${idx}`,
                     x: x / this.widthRatio(),
                     y: y / this.heightRatio(),
+                    draggable: this.getGlobalTextDraggable()
+                });
+                const moduleText = this.createTextShape({
                     name: `textContent_${idx}`,
-                    draggable: true,
                     style: {
                         // backgroundColor: "transparent",
                         fontFamily,
@@ -545,6 +552,18 @@
             const standardLineGroup = this.getFindRootGroup(standardLineGroupName);
             standardLineGroup.attr('ignore', !ignoreStatus);
         }
+        getGlobalImageDraggable() {
+            return this.globalImageDraggable;
+        }
+        updateGlobalImageDraggable(globalImageDraggable) {
+            this.globalImageDraggable = globalImageDraggable;
+        }
+        getGlobalTextDraggable() {
+            return this.globalTextDraggable;
+        }
+        updateGlobalTextDraggable(globalTextDraggable) {
+            this.globalTextDraggable = globalTextDraggable;
+        }
         /**
          * 辅助
          */
@@ -553,7 +572,54 @@
          * @param group Group
          */
         setGuideLinePosition(group) {
-            return;
+            if (!this.getUpdateGuideLineStatus())
+                return;
+            // eslint-disable-next-line prefer-const
+            const { x, y, scaleX, scaleY } = group;
+            const { width: w, height: h } = group.getBoundingRect();
+            const { zrW, zrH } = this.getZrInfo();
+            let _x = x;
+            let _y = y;
+            const guideLineGroup = this.getFindRootGroup(guideLineGroupName);
+            guideLineGroup.attr('ignore', false);
+            console.log(group);
+            const minx = Math.min(...group.children().map((e) => e.x));
+            const miny = Math.min(...group.children().map((e) => e.y));
+            if (minx < 0) {
+                _x += minx;
+            }
+            if (miny < 0) {
+                _y += miny;
+            }
+            const { LINE_TOP, LINE_RIGHT, LINE_BOTTOM, LINE_LEFT } = EGuideLineName;
+            const lineTop = guideLineGroup.childOfName(LINE_TOP);
+            const lineBottom = guideLineGroup.childOfName(LINE_BOTTOM);
+            const lineLeft = guideLineGroup.childOfName(LINE_LEFT);
+            const lineRight = guideLineGroup.childOfName(LINE_RIGHT);
+            lineTop.attr('shape', {
+                x1: 0,
+                y1: _y,
+                x2: zrW,
+                y2: _y
+            });
+            lineBottom.attr('shape', {
+                x1: 0,
+                y1: _y + h * scaleY,
+                x2: zrW,
+                y2: _y + h * scaleY
+            });
+            lineLeft.attr('shape', {
+                x1: _x,
+                y1: 0,
+                x2: _x,
+                y2: zrH
+            });
+            lineRight.attr('shape', {
+                x1: _x + w * scaleX,
+                y1: 0,
+                x2: _x + w * scaleX,
+                y2: zrH
+            });
         }
         /**
          * 边界 - 不允许模块超出画布
@@ -741,10 +807,11 @@
         saveImg(type) {
             const standardLineStatus = this.getStandardLineStatus();
             this.updateStandardLineGlobalStatus(false);
+            this.cleanSideEffects();
             window.requestAnimationFrame(() => {
                 const canvasDom = this.getZr().dom.querySelector('canvas');
                 canvasDom.toBlob((blob) => {
-                    this.updateGuideLineGlobalStatus(standardLineStatus);
+                    this.updateStandardLineGlobalStatus(standardLineStatus);
                     download(blob, `${crypto.randomUUID()}.${type.split('/')[1]}`);
                 }, type);
             });

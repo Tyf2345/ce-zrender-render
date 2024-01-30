@@ -68,6 +68,16 @@ export interface IZrenderAchieveOptions {
      */
     globalTextStatus?: boolean;
     /**
+     * 图层图片是否可拖拽 true false
+     * @default true
+     */
+    globalImageDraggable?: boolean;
+    /**
+     * 图层文字是否可拖拽 true false
+     * @default true
+     */
+    globalTextDraggable?: boolean;
+    /**
      * 点击画布内容是否增加z层级 true false
      * @default false
      */
