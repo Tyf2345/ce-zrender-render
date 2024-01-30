@@ -33,7 +33,7 @@ export declare class ZrenderAchieve {
      */
     renderCanvas(): void;
     init(): void;
-    initZr(config?: zrender.ZRenderInitOpt): zrender.ZRenderType;
+    initZr(): zrender.ZRenderType;
     /**
      * 操作
      */

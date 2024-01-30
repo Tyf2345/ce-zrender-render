@@ -246,12 +246,12 @@
             this.renderCanvas();
             this.calcRetrievedRect();
         }
-        initZr(config) {
-            if (this.domountNode === null) {
+        initZr() {
+            if (this.domountNode === null || this.domountNode === undefined) {
                 throw new Error('zrender挂载节点不存在');
             }
+            console.log('initzr', this);
             this.zr = zrender__namespace.init(this.domountNode, {
-                ...config,
                 width: this.canvasWidth,
                 height: this.canvasHeight
             });

@@ -117,12 +117,13 @@ export class ZrenderAchieve {
 		this.calcRetrievedRect();
 	}
 
-	initZr(config?: zrender.ZRenderInitOpt) {
-		if (this.domountNode === null) {
+	initZr() {
+		if (this.domountNode === null || this.domountNode === undefined) {
 			throw new Error('zrender挂载节点不存在');
 		}
+		console.log('initzr', this);
+
 		this.zr = zrender.init(this.domountNode, {
-			...config,
 			width: this.canvasWidth,
 			height: this.canvasHeight
 		});
